@@ -53,24 +53,33 @@ class Ambiente:
             if (current == self.objective): break
             if (current != self.init): self.grid[current[0]][current[1]] = '.'
 
+    # funcao que recebe uma funcao para fazer no ambiente e retorna
+    # uma nova percepcao desse ambiente alterado pela funcao recebida
     def do(self, func):
         self.grid = func(self.grid)
         return self.grid
 
+# agente que chega ao resultado através de uma BFS
 class AgenteBFS:
+
+    # inicializa pegando os limites da esquerda, direita, cima e baixo do grid
+    # seleciona o simbolo que vai marcar o ambiente enquanto anda
+    # incializa a flag que vai sinalizar se encontrou o objetivo
+    # procura ponto inicial no grid, ou seja, o 'A'
     def __init__(self, perception, walk_symbol):
         self.l_limit, self.r_limit, self.u_limit, self.d_limit = [0, len(perception[0])-1, 0, len(perception)-1]
         self.walk_symbol = walk_symbol
         self.objective_found = False
-        self.__findInitAndObjective(perception)
+        self.__findInit(perception)
 
-    def __findInitAndObjective(self, perception):
+    def __findInit(self, perception):
         for i in range(len(perception)):
             for j in range(len(perception[0])):
-                if (perception[i][j] == 'A'): self.currents = [(i,j)]
-                if (perception[i][j] == 'B'): self.objective = (i,j)
-                if (hasattr(self, 'currents') and hasattr(self, 'objective')): return
+                if (perception[i][j] == 'A'):
+                    self.currents = [(i,j)]
+                    return
     
+    # se move no grid, verificando antes se é um passo válido
     def __move(self, current, perception):
         if (self.__valid_move('L', current, perception)):
             next_coord = (current[0], current[1]-1)
@@ -94,6 +103,7 @@ class AgenteBFS:
 
         return perception
 
+    # valida o passo e verifica se encontrou o objetivo nesse proximo passo
     def __valid_move(self, direction, coord, perception):
         res = False
 
@@ -131,6 +141,7 @@ class AgenteBFS:
 
         return res
 
+    # seleciona a acao e retorna a acao que fara sobre o ambiente
     def select_action(self, perception):
         action = [row[:] for row in perception]
 
